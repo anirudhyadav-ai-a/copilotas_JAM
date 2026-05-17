@@ -1,5 +1,5 @@
 """
-Code DOM — Example 1: Python Parser & Graph Builder
+Code Graph — Example 1: Python Parser & Graph Builder
 
 Demonstrates:
   - Parsing Python files via the `ast` module
@@ -9,7 +9,7 @@ Demonstrates:
   - Storing the graph in SQLite
 
 Run:
-    python -m copilotas_JAM.examples.code_dom.python_parser.main [TARGET_DIR]
+    python -m copilotas_JAM.examples.code_graph.python_parser.main [TARGET_DIR]
 """
 
 from __future__ import annotations
@@ -255,7 +255,7 @@ def _function_signature(node: ast.FunctionDef | ast.AsyncFunctionDef) -> str:
 
 
 class SQLiteStore:
-    """Persist Code DOM nodes and edges in a SQLite database."""
+    """Persist Code Graph nodes and edges in a SQLite database."""
 
     def __init__(self, db_path: str = ":memory:") -> None:
         self._conn = sqlite3.connect(db_path)
@@ -383,7 +383,7 @@ def main() -> None:
         file_count += 1
 
     stats = store.stats()
-    print(f"\nCode DOM — Parsed {file_count} files from {target_dir.name}/")
+    print(f"\nCode Graph — Parsed {file_count} files from {target_dir.name}/")
     print(f"  Nodes: {stats['total_nodes']}")
     for ntype, count in sorted(stats["nodes_by_type"].items()):
         print(f"    {ntype}: {count}")

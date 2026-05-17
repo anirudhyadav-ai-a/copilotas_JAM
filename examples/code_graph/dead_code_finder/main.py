@@ -1,5 +1,5 @@
 """
-Code DOM — Example 3: Dead Code Finder
+Code Graph — Example 3: Dead Code Finder
 
 Demonstrates:
   - Graph reachability from defined entry points (main, API routes, exports)
@@ -8,10 +8,10 @@ Demonstrates:
   - Finding orphan classes (no instantiation, no inheritance)
 
 Run:
-    python -m copilotas_JAM.examples.code_dom.dead_code_finder.main [DIRECTORY]
+    python -m copilotas_JAM.examples.code_graph.dead_code_finder.main [DIRECTORY]
 
 Prerequisites:
-    A populated code_dom.sqlite (run python_parser first)
+    A populated code_graph.sqlite (run python_parser first)
 """
 
 from __future__ import annotations
@@ -167,12 +167,12 @@ class DeadCodeFinder:
 
 
 def main() -> None:
-    db_path = "code_dom.sqlite"
+    db_path = "code_graph.sqlite"
 
     if not Path(db_path).exists():
         print(f"Database {db_path} not found. Run python_parser first.")
         print(
-            "  python -m copilotas_JAM.examples.code_dom.python_parser.main <directory>"
+            "  python -m copilotas_JAM.examples.code_graph.python_parser.main <directory>"
         )
         return
 

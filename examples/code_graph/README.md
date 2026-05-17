@@ -1,4 +1,4 @@
-# Examples — Code DOM
+# Examples — Code Graph
 
 > Runnable code samples demonstrating the structural graph pipeline: parse → build → analyze → query.
 
@@ -24,14 +24,14 @@ Each example has a standalone `main.py`:
 pip install -e ".[all]"
 
 # Run individual examples
-python -m copilotas_JAM.examples.code_dom.python_parser.main
-python -m copilotas_JAM.examples.code_dom.impact_analyzer.main
-python -m copilotas_JAM.examples.code_dom.dead_code_finder.main
-python -m copilotas_JAM.examples.code_dom.refactor_planner.main
+python -m copilotas_JAM.examples.code_graph.python_parser.main
+python -m copilotas_JAM.examples.code_graph.impact_analyzer.main
+python -m copilotas_JAM.examples.code_graph.dead_code_finder.main
+python -m copilotas_JAM.examples.code_graph.refactor_planner.main
 ```
 
 ## Running Tests
 
 ```bash
-pytest code_dom/ -v
+pytest code_graph/ -v
 ```

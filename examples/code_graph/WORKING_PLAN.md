@@ -1,7 +1,7 @@
-# Working Plan — Code DOM: Structural Memory & Impact Analysis
+# Working Plan — Code Graph: Structural Memory & Impact Analysis
 
 > **Companion implementation guide for the whitepaper:**
-> *"Code DOM: Structural Memory & Impact Analysis"*
+> *"Code Graph: Structural Memory & Impact Analysis"*
 
 ---
 
@@ -31,7 +31,7 @@ AI code tools treat every review as if the codebase was created five minutes ago
 - Which classes haven't been tested in 90 days
 - Whether this PR introduces a circular dependency that didn't exist before
 
-**Code DOM** builds a persistent, queryable graph of the entire codebase — the structural equivalent of a DOM tree for HTML, but for code.
+**Code Graph** builds a persistent, queryable graph of the entire codebase — the structural equivalent of a DOM tree for HTML, but for code.
 
 ### Architecture Overview
 
@@ -580,18 +580,18 @@ Feature 23: Repo Stats Report
 
 ## 10. Decision Framework
 
-### When to use Code DOM vs codebase_context?
+### When to use Code Graph vs codebase_context?
 
 ```
 You want to...                               Use
 ────────────────────────────────────────     ──────────────────
 Find semantically similar code               codebase_context (embeddings)
-Answer "what calls X?"                       code_dom (call graph)
+Answer "what calls X?"                       code_graph (call graph)
 Answer "what does X mean / do?"              codebase_context (embeddings)
-Answer "what breaks if I change X?"          code_dom (impact analyzer)
+Answer "what breaks if I change X?"          code_graph (impact analyzer)
 Find functions similar to a description      codebase_context
-Find circular imports                        code_dom
-Full PR review with context                  Both (code_dom for structure + codebase_context for semantics)
+Find circular imports                        code_graph
+Full PR review with context                  Both (code_graph for structure + codebase_context for semantics)
 ```
 
 ---
@@ -624,7 +624,7 @@ radon>=6.0  # cyclomatic + cognitive complexity for Python
 ### Environment Variables
 
 ```bash
-CODE_DOM_DB_PATH=./code_dom.sqlite
+CODE_DOM_DB_PATH=./code_graph.sqlite
 CODE_DOM_MAX_DEPTH=10           # max traversal depth for impact analysis
 CODE_DOM_COMPLEXITY_THRESHOLD=10  # flag functions above this
 CODE_DOM_ENTRY_POINTS=main,app  # comma-separated for dead code analysis
@@ -643,7 +643,7 @@ CODE_DOM_ENTRY_POINTS=main,app  # comma-separated for dead code analysis
 
 ### VS Code Integration
 
-The Code DOM is wired into the Phase 0 VS Code extension via the `@codedom` chat participant:
+The Code Graph is wired into the Phase 0 VS Code extension via the `@codedom` chat participant:
 
 | Command | What It Does |
 |---------|-------------|

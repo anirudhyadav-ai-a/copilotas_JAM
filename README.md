@@ -42,7 +42,7 @@ copilotas_JAM/
 │   └── src/prompts.ts
 │
 └── examples/
-    ├── code_dom/                   ← structural memory: call graph, impact analyzer, dead code
+    ├── code_graph/                   ← structural memory: call graph, impact analyzer, dead code
     │   ├── python_parser/
     │   ├── impact_analyzer/
     │   ├── dead_code_finder/
@@ -139,9 +139,9 @@ cd vscodebase && npm install && npm run compile
 
 # Option C — Python examples
 pip install -e ".[all]"
-python -m copilotas_JAM.examples.code_dom.python_parser.main
-python -m copilotas_JAM.examples.code_dom.dead_code_finder.main
-python -m copilotas_JAM.examples.code_dom.refactor_planner.main
+python -m copilotas_JAM.examples.code_graph.python_parser.main
+python -m copilotas_JAM.examples.code_graph.dead_code_finder.main
+python -m copilotas_JAM.examples.code_graph.refactor_planner.main
 python -m copilotas_JAM.examples.ci_cd_governance.pr_reviewer.main
 python -m copilotas_JAM.examples.ci_cd_governance.merge_gate.main
 python -m copilotas_JAM.examples.ci_cd_governance.webhook_handler.main

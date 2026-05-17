@@ -41,7 +41,7 @@ You interact with the roles in two ways:
 
 - **Option A — Markdown Templates:** Copy a prompt, customise it, paste into Copilot Chat. Zero setup, fully customisable.
 - **Option B — VS Code Extension:** Type `@judge`, `@advocate`, `@mediator`, or `@codedom` in Copilot Chat. Integrated experience, prompts baked in.
-- **Option C — Python CLI:** Run the Code DOM and CI/CD Governance examples directly from the command line.
+- **Option C — Python CLI:** Run the Code Graph and CI/CD Governance examples directly from the command line.
 
 ---
 

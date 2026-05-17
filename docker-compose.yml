@@ -13,7 +13,7 @@ services:
       - REDIS_URL=redis://redis:6379
       - DATABASE_URL=postgresql://app:app@postgres:5432/judgedb
       - VECTOR_STORE=pgvector
-      - CODE_DOM_DB_PATH=/app/code_dom.sqlite
+      - CODE_DOM_DB_PATH=/app/code_graph.sqlite
     depends_on: [postgres, redis]
 
   postgres:

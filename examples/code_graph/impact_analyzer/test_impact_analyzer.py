@@ -1,6 +1,6 @@
 """Tests for the impact analyzer.
 
-Phase 0 | Code DOM — Impact Analyzer
+Phase 0 | Code Graph — Impact Analyzer
 """
 
 from __future__ import annotations

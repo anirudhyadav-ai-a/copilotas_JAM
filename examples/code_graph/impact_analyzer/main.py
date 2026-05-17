@@ -1,5 +1,5 @@
 """
-Code DOM — Example 2: Impact Analyzer
+Code Graph — Example 2: Impact Analyzer
 
 Demonstrates:
   - Traversing CALLS edges in reverse to find all callers of a function
@@ -8,10 +8,10 @@ Demonstrates:
   - Test coverage mapping (which tests cover a given function)
 
 Run:
-    python -m copilotas_JAM.examples.code_dom.impact_analyzer.main [TARGET_SYMBOL]
+    python -m copilotas_JAM.examples.code_graph.impact_analyzer.main [TARGET_SYMBOL]
 
 Prerequisites:
-    A populated code_dom.sqlite (run python_parser first)
+    A populated code_graph.sqlite (run python_parser first)
 """
 
 from __future__ import annotations
@@ -213,12 +213,12 @@ class TestCoverageMapper:
 
 def main() -> None:
     target = sys.argv[1] if len(sys.argv) > 1 else "shared.llm_client.call_llm"
-    db_path = "code_dom.sqlite"
+    db_path = "code_graph.sqlite"
 
     if not Path(db_path).exists():
         print(f"Database {db_path} not found. Run python_parser first.")
         print(
-            "  python -m copilotas_JAM.examples.code_dom.python_parser.main <directory>"
+            "  python -m copilotas_JAM.examples.code_graph.python_parser.main <directory>"
         )
         return
 

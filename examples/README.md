@@ -1,17 +1,17 @@
 # Examples — copilotas_JAM
 
-> Python examples for structural codebase memory (Code DOM) and AI-powered CI/CD governance.
+> Python examples for structural codebase memory (Code Graph) and AI-powered CI/CD governance.
 
 ---
 
-## Code DOM — Structural Memory
+## Code Graph — Structural Memory
 
 | Example | Folder | What It Demonstrates |
 |---------|--------|---------------------|
-| Python Parser | [`code_dom/python_parser/`](code_dom/python_parser/) | Python AST → CodeNode/CodeEdge graph, import resolver, call graph |
-| Impact Analyzer | [`code_dom/impact_analyzer/`](code_dom/impact_analyzer/) | Blast radius traversal, dead code finder, circular dependency detector |
-| Dead Code Finder | [`code_dom/dead_code_finder/`](code_dom/dead_code_finder/) | Graph reachability from entry points, orphan classes, unused imports |
-| Refactor Planner | [`code_dom/refactor_planner/`](code_dom/refactor_planner/) | Rename propagation, change advisor, Mermaid diagram export |
+| Python Parser | [`code_graph/python_parser/`](code_graph/python_parser/) | Python AST → CodeNode/CodeEdge graph, import resolver, call graph |
+| Impact Analyzer | [`code_graph/impact_analyzer/`](code_graph/impact_analyzer/) | Blast radius traversal, dead code finder, circular dependency detector |
+| Dead Code Finder | [`code_graph/dead_code_finder/`](code_graph/dead_code_finder/) | Graph reachability from entry points, orphan classes, unused imports |
+| Refactor Planner | [`code_graph/refactor_planner/`](code_graph/refactor_planner/) | Rename propagation, change advisor, Mermaid diagram export |
 
 ## CI/CD Governance — Judge as CI Gate
 
@@ -29,11 +29,11 @@
 ```bash
 pip install -e ".[all]"
 
-# Code DOM
-python -m copilotas_JAM.examples.code_dom.python_parser.main
-python -m copilotas_JAM.examples.code_dom.impact_analyzer.main
-python -m copilotas_JAM.examples.code_dom.dead_code_finder.main
-python -m copilotas_JAM.examples.code_dom.refactor_planner.main
+# Code Graph
+python -m copilotas_JAM.examples.code_graph.python_parser.main
+python -m copilotas_JAM.examples.code_graph.impact_analyzer.main
+python -m copilotas_JAM.examples.code_graph.dead_code_finder.main
+python -m copilotas_JAM.examples.code_graph.refactor_planner.main
 
 # CI/CD Governance
 python -m copilotas_JAM.examples.ci_cd_governance.pr_reviewer.main

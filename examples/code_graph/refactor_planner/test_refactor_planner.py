@@ -1,6 +1,6 @@
 """Tests for the refactor planner.
 
-Phase 0 | Code DOM — Refactor Planner
+Phase 0 | Code Graph — Refactor Planner
 """
 
 from __future__ import annotations

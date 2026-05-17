@@ -1,6 +1,6 @@
 """Tests for the Python parser and SQLite store.
 
-Phase 0 | Code DOM — Python Parser
+Phase 0 | Code Graph — Python Parser
 """
 
 from __future__ import annotations

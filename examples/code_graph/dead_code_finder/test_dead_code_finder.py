@@ -1,6 +1,6 @@
 """Tests for the dead code finder.
 
-Phase 0 | Code DOM — Dead Code Finder
+Phase 0 | Code Graph — Dead Code Finder
 """
 
 from __future__ import annotations

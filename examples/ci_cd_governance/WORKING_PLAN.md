@@ -341,7 +341,7 @@ name: security-reviewer
 persona: Senior security engineer specializing in OWASP Top 10
 tools:
   - codebase_context
-  - code_dom.impact_analyzer
+  - code_graph.impact_analyzer
 scope:
   - src/auth/
   - src/payments/
