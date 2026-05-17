@@ -6,7 +6,7 @@ import {
     ADVOCATE_DEVIL_SYSTEM,
     MEDIATOR_DESIGN_SYSTEM,
     MEDIATOR_DEPS_SYSTEM,
-    CODEDOM_SYSTEM,
+    CODEGRAPH_SYSTEM,
 } from './prompts';
 
 // ─────────────────────────────────────────────────────────────────
@@ -25,7 +25,7 @@ import {
 // ─────────────────────────────────────────────────────────────────
 
 type ModelFamily = 'claude' | 'gpt-4o' | 'gemini' | 'gpt-4';
-type Role = 'judge' | 'judge-security' | 'advocate-adr' | 'advocate-devil' | 'mediator-design' | 'mediator-deps' | 'codedom';
+type Role = 'judge' | 'judge-security' | 'advocate-adr' | 'advocate-devil' | 'mediator-design' | 'mediator-deps' | 'graph';
 
 /**
  * Preferred model family per role. Change these to reassign models.
@@ -39,7 +39,7 @@ const ROLE_MODEL_PREFERENCES: Record<Role, ModelFamily[]> = {
     'advocate-devil':  ['claude', 'gpt-4o', 'gemini'],   // Claude: adversarial reasoning
     'mediator-design': ['claude', 'gpt-4o', 'gemini'],   // Claude: synthesis and common ground
     'mediator-deps':   ['gpt-4o', 'claude', 'gemini'],   // GPT-4o: precise version constraint logic
-    'codedom':         ['claude', 'gemini', 'gpt-4o'],   // Claude: structural analysis and graph reasoning
+    'graph':           ['claude', 'gemini', 'gpt-4o'],   // Claude: structural analysis and graph reasoning
 };
 
 /** Maps our short family names to Copilot model id substrings */
@@ -354,16 +354,16 @@ async function handleMediator(
 }
 
 // ─────────────────────────────────────────────────────────────────
-//  🧬  Code DOM Handler
+//  🔗  Code Graph Handler
 // ─────────────────────────────────────────────────────────────────
 
-async function handleCodeDOM(
+async function handleCodeGraph(
     request: vscode.ChatRequest,
     _context: vscode.ChatContext,
     stream: vscode.ChatResponseStream,
     token: vscode.CancellationToken,
 ): Promise<void> {
-    const model = await selectModelForRole('codedom');
+    const model = await selectModelForRole('graph');
     if (!model) {
         stream.markdown('**Error:** No language model available. Make sure GitHub Copilot is active.');
         return;
@@ -377,7 +377,7 @@ async function handleCodeDOM(
         'mermaid': '📊 Mermaid Export',
     };
 
-    const label = commandLabels[command] ?? '🧬 Code DOM';
+    const label = commandLabels[command] ?? '🔗 Code Graph';
     stream.markdown(`**${label}** · ${modelLabel(model)}\n\n---\n\n`);
 
     // Build workspace context from actual files
@@ -394,7 +394,7 @@ async function handleCodeDOM(
     const prompt = commandPrompts[command] ?? userPrompt;
 
     const messages = [
-        vscode.LanguageModelChatMessage.User(`[SYSTEM INSTRUCTIONS]\n\n${CODEDOM_SYSTEM}`),
+        vscode.LanguageModelChatMessage.User(`[SYSTEM INSTRUCTIONS]\n\n${CODEGRAPH_SYSTEM}`),
         vscode.LanguageModelChatMessage.User(`## Workspace Context\n${workspaceContext}\n\n## Request\n${prompt}`),
     ];
 
@@ -402,8 +402,8 @@ async function handleCodeDOM(
 }
 
 /**
- * Scan workspace Python files and build a structural context string
- * for the Code DOM commands.
+ * Scan workspace source files and build a structural context string
+ * for the Code Graph commands.
  */
 async function buildCodeContext(): Promise<string> {
     const sourceFiles = await vscode.workspace.findFiles(
@@ -475,27 +475,27 @@ export function activate(context: vscode.ExtensionContext): void {
     );
     mediator.iconPath = new vscode.ThemeIcon('git-merge');
 
-    // 🧬 Code DOM
-    const codedom = vscode.chat.createChatParticipant(
-        'copilotas-jam.codedom',
-        handleCodeDOM,
+    // 🔗 Code Graph
+    const graph = vscode.chat.createChatParticipant(
+        'copilotas-jam.graph',
+        handleCodeGraph,
     );
-    codedom.iconPath = new vscode.ThemeIcon('symbol-structure');
+    graph.iconPath = new vscode.ThemeIcon('symbol-structure');
 
-    // Register Code DOM command palette entries
+    // Register Code Graph command palette entries
     context.subscriptions.push(
-        judge, advocate, mediator, codedom,
+        judge, advocate, mediator, graph,
         vscode.commands.registerCommand('copilotas-jam.impact', () =>
-            vscode.commands.executeCommand('workbench.action.chat.open', { query: '@codedom /impact ' }),
+            vscode.commands.executeCommand('workbench.action.chat.open', { query: '@graph /impact ' }),
         ),
         vscode.commands.registerCommand('copilotas-jam.deadcode', () =>
-            vscode.commands.executeCommand('workbench.action.chat.open', { query: '@codedom /deadcode ' }),
+            vscode.commands.executeCommand('workbench.action.chat.open', { query: '@graph /deadcode ' }),
         ),
         vscode.commands.registerCommand('copilotas-jam.refactor', () =>
-            vscode.commands.executeCommand('workbench.action.chat.open', { query: '@codedom /refactor ' }),
+            vscode.commands.executeCommand('workbench.action.chat.open', { query: '@graph /refactor ' }),
         ),
         vscode.commands.registerCommand('copilotas-jam.mermaid', () =>
-            vscode.commands.executeCommand('workbench.action.chat.open', { query: '@codedom /mermaid ' }),
+            vscode.commands.executeCommand('workbench.action.chat.open', { query: '@graph /mermaid ' }),
         ),
     );
 }

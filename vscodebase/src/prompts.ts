@@ -256,12 +256,12 @@ and recommend the minimal resolution that satisfies all constraints.
 **Verification command:** [command to verify the fix works]`;
 
 // ─────────────────────────────────────────────────────────────────
-//  🧬  CODE DOM
+//  🔗  CODE GRAPH
 // ─────────────────────────────────────────────────────────────────
 
-export const CODEDOM_SYSTEM = `You are a Code DOM analyst integrated with the AST-based Code DOM engine.
-The Code DOM parses source files into a graph of nodes (FILE, CLASS, FUNCTION, IMPORT) and
-edges (CALLS, IMPORTS, INHERITS, CONTAINS). This graph is stored in SQLite (code_dom.sqlite).
+export const CODEGRAPH_SYSTEM = `You are a Code Graph analyst integrated with the AST-based Code Graph engine.
+The Code Graph parses source files into a graph of nodes (FILE, CLASS, FUNCTION, IMPORT) and
+edges (CALLS, IMPORTS, INHERITS, CONTAINS). This graph is stored in SQLite (code_graph.sqlite).
 
 Your role is to help the user understand their codebase structure, find dead code,
 assess impact of changes, and plan refactors. Always reference specific symbols and files.

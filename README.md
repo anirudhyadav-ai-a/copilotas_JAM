@@ -12,7 +12,7 @@ This folder is the complete reference implementation for *"Beyond the Code: LLM 
 |---|---|
 | [`WORKING_PLAN.md`](WORKING_PLAN.md) | **Implementation guide** — all 61 must-have features, architecture diagrams, decision frameworks |
 | [`prompts/`](prompts/) | Zero-setup Markdown templates — copy, paste, run |
-| [`vscodebase/`](vscodebase/) | VS Code extension with `@judge`, `@advocate`, `@mediator`, `@codedom` chat participants |
+| [`vscodebase/`](vscodebase/) | VS Code extension with `@judge`, `@advocate`, `@mediator`, `@graph` chat participants |
 | [`examples/`](examples/) | Python examples — code DOM, CI/CD governance |
 
 ---
@@ -78,7 +78,7 @@ copilotas_JAM/
 17. Batch review (multiple files → consolidated report)
 18. Override tracking (human overrides → rubric calibration)
 
-### Code DOM — Structural Memory (23 features — 5 implemented)
+### Code Graph — Structural Memory (23 features — 5 implemented)
 19. Python AST parser (classes, functions, imports, decorators)
 20. TypeScript tree-sitter parser
 21. CodeNode data model

@@ -1,6 +1,6 @@
 # Option B — Copilotas JAM VS Code Extension
 
-> A Copilot Chat Participant extension that registers `@judge`, `@advocate`, `@mediator`, and `@codedom` as commands in GitHub Copilot Chat. Piggybacks your org's Copilot LLM — no separate API keys required.
+> A Copilot Chat Participant extension that registers `@judge`, `@advocate`, `@mediator`, and `@graph` as commands in GitHub Copilot Chat. Piggybacks your org's Copilot LLM — no separate API keys required.
 
 ---
 
@@ -15,12 +15,12 @@
 | `@advocate /devil` | 👿 Advocate | Stress-tests your proposal. Returns PROCEED / REVISE / RECONSIDER. |
 | `@mediator /design` | 🤝 Mediator | Mediates a design conflict between two positions. Finds synthesis. |
 | `@mediator /deps` | 📦 Mediator | Resolves dependency version conflicts. |
-| `@codedom /impact` | 🧬 Code DOM | Analyse blast radius of changing a symbol. |
-| `@codedom /deadcode` | 🧬 Code DOM | Find unreachable functions and unused imports. |
-| `@codedom /refactor` | 🧬 Code DOM | Plan a rename refactor across callers. |
-| `@codedom /mermaid` | 🧬 Code DOM | Export dependency graph as Mermaid diagram. |
+| `@graph /impact` | 🔗 Code Graph | Analyse blast radius of changing a symbol. |
+| `@graph /deadcode` | 🔗 Code Graph | Find unreachable functions and unused imports. |
+| `@graph /refactor` | 🔗 Code Graph | Plan a rename refactor across callers. |
+| `@graph /mermaid` | 🔗 Code Graph | Export dependency graph as Mermaid diagram. |
 
-The four `@codedom` commands are also available from the **Command Palette** (`Ctrl+Shift+P`) as:
+The four `@graph` commands are also available from the **Command Palette** (`Ctrl+Shift+P`) as:
 - `JAM: Impact Analysis`
 - `JAM: Dead Code Finder`
 - `JAM: Refactor Planner`
@@ -104,26 +104,26 @@ The backend already has a schema-first design that maps well to GraphQL types.
 our data model is becoming more document-oriented and we need horizontal scaling.
 ```
 
-### Code DOM — Impact analysis
+### Code Graph — Impact analysis
 
 ```
-@codedom /impact UserService.authenticate
+@graph /impact UserService.authenticate
 ```
 
 Analyses which callers, tests, and downstream modules would be affected.
 
-### Code DOM — Dead code
+### Code Graph — Dead code
 
 ```
-@codedom /deadcode
+@graph /deadcode
 ```
 
 Scans workspace for unreachable functions, unused imports, and orphan classes.
 
-### Code DOM — Mermaid diagram
+### Code Graph — Mermaid diagram
 
 ```
-@codedom /mermaid auth module
+@graph /mermaid auth module
 ```
 
 Exports a Mermaid flowchart of the call graph.
@@ -167,7 +167,7 @@ vscodebase/
 
 ## How It Works
 
-1. **Chat Participants** are registered in `package.json` under `contributes.chatParticipants`. This tells VS Code to show `@judge`, `@advocate`, `@mediator`, and `@codedom` in the Copilot Chat autocomplete.
+1. **Chat Participants** are registered in `package.json` under `contributes.chatParticipants`. This tells VS Code to show `@judge`, `@advocate`, `@mediator`, and `@graph` in the Copilot Chat autocomplete.
 
 2. **Handlers** in `extension.ts` are called when the user invokes a participant. Each handler:
    - Selects a Copilot language model via `vscode.lm.selectChatModels()`
@@ -200,7 +200,7 @@ In `extension.ts`, the `ROLE_MODEL_PREFERENCES` map controls which model family 
 | Advocate Devil | Claude → GPT-4o → Gemini |
 | Mediator Design | Claude → GPT-4o → Gemini |
 | Mediator Deps | GPT-4o → Claude → Gemini |
-| Code DOM | Claude → Gemini → GPT-4o |
+| Code Graph | Claude → Gemini → GPT-4o |
 
 Edit `ROLE_MODEL_PREFERENCES` at the top of `extension.ts` to reassign models. `selectModelForRole()` resolves preferences at runtime by matching against your org's available Copilot models and falls back to any Copilot model if none match.
 

@@ -78,10 +78,10 @@
         ]
       },
       {
-        "id": "copilotas-jam.codedom",
-        "name": "codedom",
-        "fullName": "Copilotas Code DOM",
-        "description": "Analyse code structure, find dead code, assess impact, and plan refactors using the Code DOM graph.",
+        "id": "copilotas-jam.graph",
+        "name": "graph",
+        "fullName": "Copilotas Code Graph",
+        "description": "Analyse code structure, find dead code, assess impact, and plan refactors using the Code Graph.",
         "isSticky": false,
         "commands": [
           {
