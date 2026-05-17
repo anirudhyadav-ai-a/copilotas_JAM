@@ -1,0 +1,150 @@
+{
+  "name": "copilotas-jam",
+  "displayName": "Copilotas JAM — Judge, Advocate & Mediator",
+  "description": "Use your Copilot's LLM as Judge, Advocate, and Mediator. Structured code review, ADR generation, design conflict resolution — all inside Copilot Chat.",
+  "version": "0.1.0",
+  "publisher": "copilotas",
+  "license": "MIT",
+  "engines": {
+    "vscode": "^1.93.0"
+  },
+  "categories": [
+    "AI",
+    "Linters",
+    "Other"
+  ],
+  "keywords": [
+    "copilot",
+    "judge",
+    "advocate",
+    "mediator",
+    "code review",
+    "architecture",
+    "ADR"
+  ],
+  "activationEvents": [],
+  "main": "./out/extension.js",
+  "contributes": {
+    "chatParticipants": [
+      {
+        "id": "copilotas-jam.judge",
+        "name": "judge",
+        "fullName": "Copilotas Judge",
+        "description": "Review code against your team's rubric. Returns APPROVE / REQUEST_CHANGES / BLOCK with severity-graded findings.",
+        "isSticky": false,
+        "commands": [
+          {
+            "name": "review",
+            "description": "Review the active file or selection against the rubric"
+          },
+          {
+            "name": "security",
+            "description": "Run a security audit (OWASP Top-10 focus)"
+          }
+        ]
+      },
+      {
+        "id": "copilotas-jam.advocate",
+        "name": "advocate",
+        "fullName": "Copilotas Advocate",
+        "description": "Generate Architecture Decision Records and stress-test proposals before design reviews.",
+        "isSticky": false,
+        "commands": [
+          {
+            "name": "adr",
+            "description": "Generate an Architecture Decision Record from a proposal"
+          },
+          {
+            "name": "devil",
+            "description": "Devil's Advocate — stress-test a proposal before committing"
+          }
+        ]
+      },
+      {
+        "id": "copilotas-jam.mediator",
+        "name": "mediator",
+        "fullName": "Copilotas Mediator",
+        "description": "Mediate design conflicts between engineers. Finds synthesis, not a winner.",
+        "isSticky": false,
+        "commands": [
+          {
+            "name": "design",
+            "description": "Resolve a design conflict between two positions"
+          },
+          {
+            "name": "deps",
+            "description": "Mediate dependency version conflicts"
+          }
+        ]
+      },
+      {
+        "id": "copilotas-jam.codedom",
+        "name": "codedom",
+        "fullName": "Copilotas Code DOM",
+        "description": "Analyse code structure, find dead code, assess impact, and plan refactors using the Code DOM graph.",
+        "isSticky": false,
+        "commands": [
+          {
+            "name": "impact",
+            "description": "Analyse blast radius of changing a symbol"
+          },
+          {
+            "name": "deadcode",
+            "description": "Find unreachable functions and unused imports"
+          },
+          {
+            "name": "refactor",
+            "description": "Plan a rename refactor across callers"
+          },
+          {
+            "name": "mermaid",
+            "description": "Export dependency graph as Mermaid diagram"
+          }
+        ]
+      }
+    ],
+    "commands": [
+      {
+        "command": "copilotas-jam.impact",
+        "title": "JAM: Impact Analysis"
+      },
+      {
+        "command": "copilotas-jam.deadcode",
+        "title": "JAM: Dead Code Finder"
+      },
+      {
+        "command": "copilotas-jam.refactor",
+        "title": "JAM: Refactor Planner"
+      },
+      {
+        "command": "copilotas-jam.mermaid",
+        "title": "JAM: Export Mermaid Diagram"
+      }
+    ]
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "lint": "eslint src --ext ts",
+    "test": "jest",
+    "package": "npx @vscode/vsce package --no-dependencies"
+  },
+  "jest": {
+    "preset": "ts-jest",
+    "testEnvironment": "node",
+    "testMatch": ["**/*.test.ts"]
+  },
+  "devDependencies": {
+    "@types/vscode": "^1.95.0",
+    "@types/node": "^20.0.0",
+    "@types/jest": "^29.0.0",
+    "typescript": "^5.3.0",
+    "ts-jest": "^29.0.0",
+    "jest": "^29.0.0",
+    "eslint": "^8.57.0",
+    "@typescript-eslint/eslint-plugin": "^7.0.0",
+    "@typescript-eslint/parser": "^7.0.0",
+    "@vscode/vsce": "^3.0.0"
+  }
+}
