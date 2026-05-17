@@ -6,6 +6,7 @@ import {
     ADVOCATE_DEVIL_SYSTEM,
     MEDIATOR_DESIGN_SYSTEM,
     MEDIATOR_DEPS_SYSTEM,
+    CODEDOM_SYSTEM,
 } from './prompts';
 
 // ─────────────────────────────────────────────────────────────────
@@ -24,7 +25,7 @@ import {
 // ─────────────────────────────────────────────────────────────────
 
 type ModelFamily = 'claude' | 'gpt-4o' | 'gemini' | 'gpt-4';
-type Role = 'judge' | 'judge-security' | 'advocate-adr' | 'advocate-devil' | 'mediator-design' | 'mediator-deps';
+type Role = 'judge' | 'judge-security' | 'advocate-adr' | 'advocate-devil' | 'mediator-design' | 'mediator-deps' | 'codedom';
 
 /**
  * Preferred model family per role. Change these to reassign models.
@@ -38,6 +39,7 @@ const ROLE_MODEL_PREFERENCES: Record<Role, ModelFamily[]> = {
     'advocate-devil':  ['claude', 'gpt-4o', 'gemini'],   // Claude: adversarial reasoning
     'mediator-design': ['claude', 'gpt-4o', 'gemini'],   // Claude: synthesis and common ground
     'mediator-deps':   ['gpt-4o', 'claude', 'gemini'],   // GPT-4o: precise version constraint logic
+    'codedom':         ['claude', 'gemini', 'gpt-4o'],   // Claude: structural analysis and graph reasoning
 };
 
 /** Maps our short family names to Copilot model id substrings */
@@ -226,7 +228,8 @@ async function handleJudge(
         : `Review this code:\n\n\`\`\`\n${codeContent}\n\`\`\``;
 
     const messages = [
-        new vscode.LanguageModelChatMessage(vscode.LanguageModelChatMessageRole.User, systemPrompt + '\n\n' + userPrompt),
+        vscode.LanguageModelChatMessage.User(`[SYSTEM INSTRUCTIONS]\n\n${systemPrompt}`),
+        vscode.LanguageModelChatMessage.User(userPrompt),
     ];
 
     await streamResponse(model, messages, stream, token);
@@ -269,7 +272,13 @@ async function handleAdvocate(
         if (!isUri(ref.value)) { continue; }
         const uri = ref.value;
         const doc = await vscode.workspace.openTextDocument(uri);
-        context += `\n## Codebase Context (${uri.fsPath})\n${doc.getText().substring(0, 6000)}\n`;
+        let fileText = doc.getText();
+        const maxFileChars = 6000;
+        if (fileText.length > maxFileChars) {
+            const cutPoint = fileText.lastIndexOf('\n', maxFileChars);
+            fileText = fileText.substring(0, cutPoint > 0 ? cutPoint : maxFileChars) + '\n[... truncated ...]';
+        }
+        context += `\n## Codebase Context (${uri.fsPath})\n${fileText}\n`;
     }
 
     const userPrompt = context
@@ -277,7 +286,8 @@ async function handleAdvocate(
         : `## Proposal\n${request.prompt}`;
 
     const messages = [
-        new vscode.LanguageModelChatMessage(vscode.LanguageModelChatMessageRole.User, systemPrompt + '\n\n' + userPrompt),
+        vscode.LanguageModelChatMessage.User(`[SYSTEM INSTRUCTIONS]\n\n${systemPrompt}`),
+        vscode.LanguageModelChatMessage.User(userPrompt),
     ];
 
     await streamResponse(model, messages, stream, token);
@@ -322,7 +332,13 @@ async function handleMediator(
         if (!isUri(ref.value)) { continue; }
         const uri = ref.value;
         const doc = await vscode.workspace.openTextDocument(uri);
-        context += `\n## Context from ${uri.fsPath}\n${doc.getText().substring(0, 6000)}\n`;
+        let mediatorText = doc.getText();
+        const maxMediatorChars = 6000;
+        if (mediatorText.length > maxMediatorChars) {
+            const cutPoint = mediatorText.lastIndexOf('\n', maxMediatorChars);
+            mediatorText = mediatorText.substring(0, cutPoint > 0 ? cutPoint : maxMediatorChars) + '\n[... truncated ...]';
+        }
+        context += `\n## Context from ${uri.fsPath}\n${mediatorText}\n`;
     }
 
     const userPrompt = context
@@ -330,7 +346,8 @@ async function handleMediator(
         : request.prompt;
 
     const messages = [
-        new vscode.LanguageModelChatMessage(vscode.LanguageModelChatMessageRole.User, systemPrompt + '\n\n' + userPrompt),
+        vscode.LanguageModelChatMessage.User(`[SYSTEM INSTRUCTIONS]\n\n${systemPrompt}`),
+        vscode.LanguageModelChatMessage.User(userPrompt),
     ];
 
     await streamResponse(model, messages, stream, token);
@@ -340,20 +357,13 @@ async function handleMediator(
 //  🧬  Code DOM Handler
 // ─────────────────────────────────────────────────────────────────
 
-const CODEDOM_SYSTEM = `You are a Code DOM analyst integrated with the Python AST-based Code DOM engine.
-The Code DOM parses Python source into a graph of nodes (FILE, CLASS, FUNCTION, IMPORT) and
-edges (CALLS, IMPORTS, INHERITS, CONTAINS). This graph is stored in SQLite (code_dom.sqlite).
-
-Your role is to help the user understand their codebase structure, find dead code,
-assess impact of changes, and plan refactors. Always reference specific symbols and files.`;
-
 async function handleCodeDOM(
     request: vscode.ChatRequest,
     _context: vscode.ChatContext,
     stream: vscode.ChatResponseStream,
     token: vscode.CancellationToken,
 ): Promise<void> {
-    const model = await selectModelForRole('judge');
+    const model = await selectModelForRole('codedom');
     if (!model) {
         stream.markdown('**Error:** No language model available. Make sure GitHub Copilot is active.');
         return;
@@ -384,10 +394,8 @@ async function handleCodeDOM(
     const prompt = commandPrompts[command] ?? userPrompt;
 
     const messages = [
-        new vscode.LanguageModelChatMessage(
-            vscode.LanguageModelChatMessageRole.User,
-            CODEDOM_SYSTEM + `\n\n## Workspace Context\n${workspaceContext}\n\n## Request\n${prompt}`
-        ),
+        vscode.LanguageModelChatMessage.User(`[SYSTEM INSTRUCTIONS]\n\n${CODEDOM_SYSTEM}`),
+        vscode.LanguageModelChatMessage.User(`## Workspace Context\n${workspaceContext}\n\n## Request\n${prompt}`),
     ];
 
     await streamResponse(model, messages, stream, token);
@@ -398,22 +406,30 @@ async function handleCodeDOM(
  * for the Code DOM commands.
  */
 async function buildCodeContext(): Promise<string> {
-    const pyFiles = await vscode.workspace.findFiles('**/*.py', '**/node_modules/**', 50);
-    if (pyFiles.length === 0) {
-        return '(No Python files found in workspace)';
+    const sourceFiles = await vscode.workspace.findFiles(
+        '**/*.{py,ts,js,tsx,jsx}',
+        '**/node_modules/**',
+        50,
+    );
+    if (sourceFiles.length === 0) {
+        return '(No source files found in workspace)';
     }
 
-    const parts: string[] = [`Found ${pyFiles.length} Python files:\n`];
+    const parts: string[] = [`Found ${sourceFiles.length} source files:\n`];
 
-    for (const uri of pyFiles.slice(0, 20)) {
+    // Python and TypeScript/JavaScript symbol extraction patterns
+    const symbolPattern = /^(?:(?:export\s+)?(?:class|def|async def|function|async function|const|interface|type|enum)\s+(\w+))/;
+
+    for (const uri of sourceFiles.slice(0, 20)) {
         try {
             const doc = await vscode.workspace.openTextDocument(uri);
             const text = doc.getText();
             const relativePath = vscode.workspace.asRelativePath(uri);
+            const lang = uri.fsPath.endsWith('.py') ? 'python' : 'typescript';
             const symbols: string[] = [];
 
             for (const line of text.split('\n')) {
-                const match = line.match(/^(?:class|def|async def)\s+(\w+)/);
+                const match = line.match(symbolPattern);
                 if (match) {
                     symbols.push(match[1]);
                 }
@@ -423,8 +439,8 @@ async function buildCodeContext(): Promise<string> {
             if (symbols.length > 0) {
                 parts.push(`Symbols: ${symbols.join(', ')}`);
             }
-            const snippet = text.length > 500 ? text.slice(0, 500) + '\n# ...' : text;
-            parts.push('```python\n' + snippet + '\n```\n');
+            const snippet = text.length > 500 ? text.slice(0, 500) + '\n// ...' : text;
+            parts.push('```' + lang + '\n' + snippet + '\n```\n');
         } catch {
             // skip unreadable files
         }
@@ -443,7 +459,7 @@ export function activate(context: vscode.ExtensionContext): void {
         'copilotas-jam.judge',
         handleJudge,
     );
-    judge.iconPath = new vscode.ThemeIcon('law');
+    judge.iconPath = new vscode.ThemeIcon('scale');
 
     // 📐 Advocate
     const advocate = vscode.chat.createChatParticipant(
@@ -466,7 +482,22 @@ export function activate(context: vscode.ExtensionContext): void {
     );
     codedom.iconPath = new vscode.ThemeIcon('symbol-structure');
 
-    context.subscriptions.push(judge, advocate, mediator, codedom);
+    // Register Code DOM command palette entries
+    context.subscriptions.push(
+        judge, advocate, mediator, codedom,
+        vscode.commands.registerCommand('copilotas-jam.impact', () =>
+            vscode.commands.executeCommand('workbench.action.chat.open', { query: '@codedom /impact ' }),
+        ),
+        vscode.commands.registerCommand('copilotas-jam.deadcode', () =>
+            vscode.commands.executeCommand('workbench.action.chat.open', { query: '@codedom /deadcode ' }),
+        ),
+        vscode.commands.registerCommand('copilotas-jam.refactor', () =>
+            vscode.commands.executeCommand('workbench.action.chat.open', { query: '@codedom /refactor ' }),
+        ),
+        vscode.commands.registerCommand('copilotas-jam.mermaid', () =>
+            vscode.commands.executeCommand('workbench.action.chat.open', { query: '@codedom /mermaid ' }),
+        ),
+    );
 }
 
 export function deactivate(): void {

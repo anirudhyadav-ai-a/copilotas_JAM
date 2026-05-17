@@ -10,7 +10,7 @@ Demonstrates:
 
 Run:
     python -m copilotas_JAM.examples.ci_cd_governance.webhook_handler.main
-    # Server starts on http://localhost:8090/webhooks/github
+    # Server starts on http://localhost:8080/webhooks/github
 
 Prerequisites:
     pip install fastapi uvicorn
@@ -284,8 +284,8 @@ def main() -> None:
         return
 
     app = create_app()
-    print("Starting webhook handler on http://localhost:8090")
-    uvicorn.run(app, host="0.0.0.0", port=8090)
+    print("Starting webhook handler on http://localhost:8080")
+    uvicorn.run(app, host="0.0.0.0", port=8080)
 
 
 if __name__ == "__main__":

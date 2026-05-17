@@ -264,9 +264,9 @@ class SQLiteStore:
 
     def _create_tables(self) -> None:
         self._conn.executescript("""
-            CREATE TABLE IF NOT EXISTS code_nodes (
-                id TEXT PRIMARY KEY,
-                type TEXT NOT NULL,
+            CREATE TABLE IF NOT EXISTS nodes (
+                node_id TEXT PRIMARY KEY,
+                kind TEXT NOT NULL,
                 name TEXT NOT NULL,
                 file_path TEXT NOT NULL,
                 start_line INTEGER,
@@ -277,25 +277,25 @@ class SQLiteStore:
                 content_hash TEXT,
                 metadata TEXT
             );
-            CREATE TABLE IF NOT EXISTS code_edges (
-                id TEXT PRIMARY KEY,
+            CREATE TABLE IF NOT EXISTS edges (
+                edge_id TEXT PRIMARY KEY,
                 source_id TEXT NOT NULL,
                 target_id TEXT NOT NULL,
-                type TEXT NOT NULL,
+                kind TEXT NOT NULL,
                 call_site INTEGER,
-                FOREIGN KEY (source_id) REFERENCES code_nodes(id),
-                FOREIGN KEY (target_id) REFERENCES code_nodes(id)
+                FOREIGN KEY (source_id) REFERENCES nodes(node_id),
+                FOREIGN KEY (target_id) REFERENCES nodes(node_id)
             );
-            CREATE INDEX IF NOT EXISTS idx_nodes_file ON code_nodes(file_path);
-            CREATE INDEX IF NOT EXISTS idx_edges_source ON code_edges(source_id);
-            CREATE INDEX IF NOT EXISTS idx_edges_target ON code_edges(target_id);
+            CREATE INDEX IF NOT EXISTS idx_nodes_file ON nodes(file_path);
+            CREATE INDEX IF NOT EXISTS idx_edges_source ON edges(source_id);
+            CREATE INDEX IF NOT EXISTS idx_edges_target ON edges(target_id);
         """)
 
     def upsert_nodes(self, nodes: list[CodeNode]) -> int:
         """Insert or replace nodes. Returns count of upserted rows."""
         self._conn.executemany(
-            """INSERT OR REPLACE INTO code_nodes
-               (id, type, name, file_path, start_line, end_line, signature, docstring, language, content_hash)
+            """INSERT OR REPLACE INTO nodes
+               (node_id, kind, name, file_path, start_line, end_line, signature, docstring, language, content_hash)
                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
             [
                 (
@@ -319,8 +319,8 @@ class SQLiteStore:
     def upsert_edges(self, edges: list[CodeEdge]) -> int:
         """Insert or replace edges. Returns count of upserted rows."""
         self._conn.executemany(
-            """INSERT OR REPLACE INTO code_edges
-               (id, source_id, target_id, type, call_site)
+            """INSERT OR REPLACE INTO edges
+               (edge_id, source_id, target_id, kind, call_site)
                VALUES (?, ?, ?, ?, ?)""",
             [(e.id, e.source_id, e.target_id, e.type, e.call_site) for e in edges],
         )
@@ -331,12 +331,12 @@ class SQLiteStore:
         """Return summary statistics of the stored graph."""
         node_counts = dict(
             self._conn.execute(
-                "SELECT type, COUNT(*) FROM code_nodes GROUP BY type"
+                "SELECT kind, COUNT(*) FROM nodes GROUP BY kind"
             ).fetchall()
         )
         edge_counts = dict(
             self._conn.execute(
-                "SELECT type, COUNT(*) FROM code_edges GROUP BY type"
+                "SELECT kind, COUNT(*) FROM edges GROUP BY kind"
             ).fetchall()
         )
         total_nodes = sum(node_counts.values())
